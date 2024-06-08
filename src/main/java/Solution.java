@@ -1,31 +1,34 @@
 import java.util.HashMap;
 import java.util.Map;
 
-public class Solution {
+class Solution {
     public boolean checkSubarraySum(int[] nums, int k) {
+
         int n = nums.length;
-        int[] prefixSum = new int[n];
-        Map<Integer, Integer> mapPrefix = new HashMap<>();
-        prefixSum[0] = nums[0];
-        mapPrefix.put(prefixSum[0], 0);
-        for(int i = 1; i < n; i++){
-            prefixSum[i] = prefixSum[i - 1] + nums[i];
-            if(prefixSum[i] % k == 0 || (nums[i - 1] == 0 && nums[i] == 0) ){
-                return true;
-            }
-            mapPrefix.put(prefixSum[i], i);
+        if(n < 2) {
+            return false;
         }
-        int iter = (prefixSum[n - 1] - prefixSum[0]) / k;
+        int[] ps = new int[n];
+        ps[0] = nums[0];
+        for(int i = 1; i < n; i++) {
+            ps[i] = ps[i - 1] + nums[i];
+        }
+        Map<Integer, Integer> map = new HashMap<>();
 
         for(int i = 0; i < n; i++){
-            for(int j = 1; j <= iter; j++){
-                if(prefixSum[i] + k * j > prefixSum[n - 1]){
-                    break;
+            if(nums[i] == 0) {
+                if(map.containsKey(0) || (i > 0 && nums[i - 1] == 0)){
+                    return true;
                 }
-                if(mapPrefix.containsKey(prefixSum[i] + k * j)){
-                    if(mapPrefix.get(prefixSum[i] + k * j) - i > 1 ){
-                        return true;
-                    }
+                continue;
+            }
+            if(ps[i] % k == 0 && i != 0) {
+                return true;
+            }else {
+                if(map.containsKey(ps[i] % k) && map.get(ps[i] % k) != i - 1) {
+                    return true;
+                }else {
+                    map.put(ps[i] % k, i);
                 }
             }
         }
